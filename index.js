@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended:true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(socialNetworkRoutes);
 
-const PORT = process.env.APP_PORT || 80;
+const PORT = process.env.PORT || 5000;
 
 async function main() {
   try {
