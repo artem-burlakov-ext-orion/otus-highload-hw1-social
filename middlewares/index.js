@@ -11,10 +11,10 @@ const {
 const isAuth = (req, res, next) => {
   console.log('REQ.SESSION.LOGGEDIN', req.session.loggedIn);
   if (req.session.loggedIn) {
-    res.redirect('/users');;
+    res.redirect('/users');
     return;
   }
-  res.redirect('/');
+  res.render('login');
 };
 
 
