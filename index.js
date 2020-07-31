@@ -1,11 +1,9 @@
-
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
 const startMySqlPool = require('./db');
 const socialNetworkRoutes = require('./routes/index');
-
 
 const app = express();
 
@@ -36,11 +34,3 @@ async function main() {
 };
 
 main();
-
-
-// app.use(express.json());
-
-
-
-
-

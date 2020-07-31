@@ -6,14 +6,13 @@
     {{#each users}}
       <li class="profile">
         <label>
-          
           {{#if isFriendForMe}}
             <input type="hidden" name="friendsData" value="{{id}}">
             <input type="checkbox" name="friendsData" value="x" checked>
           {{else}}
             <input type="checkbox" name="newFriends" value="{{id}}">
           {{/if}}
-          <span>{{name}}</span>
+          <span>{{username}}</span>
           <span>{{surname}}</span>
           <span>{{age}}</span>
           <span>{{gender}}</span>
@@ -22,7 +21,7 @@
         </label>
       </li>
     {{/each}}
-    <button type="submit" class="btn btn-small" >Save changes</button>
+    <button type="submit" class="btn btn-small">Save changes</button>
   </ul>
   
 </form>

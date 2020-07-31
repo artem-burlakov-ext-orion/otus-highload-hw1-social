@@ -1,11 +1,14 @@
 require('dotenv').config();
-const bcrypt = require('bcrypt');
+
 const {Router} = require('express');
+
 const router = Router();
 const { 
   isAuth,
   register,
   getAllUsers,
+  auth,
+  logout
  } = require('../middlewares/index');
 const session = require('express-session');
 
@@ -23,27 +26,7 @@ router.get('/', (req, res) => {
   res.render('login');
 });
 
-router.post('/auth', async (req, res) => {
-  const { login, password } = req.body;
-  try {
-    const sql = `SELECT id, login, password
-                 FROM users
-                 WHERE login=?`;
-    const data = [login];
-    const user = await pool.query(sql, data);
-    if ((user[0].length !== 0) && (await bcrypt.compare(password, user[0][0].password))) {
-      req.session.loggedIn = true;
-      req.session.login = login;
-      req.session.userId = user[0][0].id;
-      console.log('AUTH', req.session);
-      res.redirect('/users');
-      return;
-    }
-    res.send('Incorrect Username and/or Password!');
-  } catch(e) {
-    console.log(e);
-  } 
-});
+router.post('/auth', auth);
 
 router.get('/users', isAuth, getAllUsers);
  
@@ -53,11 +36,15 @@ router.get('/register', (req, res) => {
   });
 });
 
+router.get('/logout', logout, (req, res) => {
+  res.redirect('/');
+})
+
 router.post('/register', register);
   
 
 router.post('/friend', async (req, res) => {
-  const id = req.session.userid;
+  const id = req.session.userId;
   const { friendsData, newFriends } = req.body;
   console.log('DATA', friendsData);
   if (friendsData) {
@@ -120,10 +107,10 @@ router.post('/friend', async (req, res) => {
 
     const arrToUpdateUserIds = toUpdate[0]
       .map((toUpdateObj) => toUpdateObj.userId);
-      console.log(arrToUpdateUserIds);
+      console.log('ADDFRIEND TOUPDATE', arrToUpdateUserIds);
     const arrToInsertFriendIds = toAddNewFriends
       .filter((elem) => !arrToUpdateUserIds.includes(elem));
-    console.log(arrToInsertFriendIds);
+    console.log('ADD FRIEND TO INSERT', arrToInsertFriendIds);
     
     if (arrToInsertFriendIds.length !== 0) {
       const sql5 = `INSERT INTO friends(userId, friendId)
@@ -133,7 +120,7 @@ router.post('/friend', async (req, res) => {
         toInsertNotMutual.push([id, friendId]);
       });
       const data5 = toInsertNotMutual;
-      console.log(data5);
+      console.log('ADD NOT MUTUAL TO INSERT', data5);
       const result = await pool.query(sql5, [data5]);
       console.log(result[0]);
     }
