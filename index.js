@@ -26,7 +26,7 @@ const PORT = process.env.APP_PORT || 80;
 async function main() {
   try {
     await startMySqlPool();
-    app.listen(PORT), () => {
+    app.listen(PORT, () => {
       console.log(`Server has been started on port ${process.env.APP_PORT}`);
     });
   } catch (e) {
