@@ -20,9 +20,7 @@ router.use(session({
 	saveUninitialized: true
 }));
 
-router.get('/', isAuth, (req, res) => {
-  res.redirect('/users');
-});
+router.get('/', isAuth);
 
 router.post('/auth', auth);
 

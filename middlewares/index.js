@@ -8,10 +8,10 @@ const {
 } = require('../sql/index');
 
 
-const isAuth = async (req, res, next) => {
+const isAuth = (req, res, next) => {
   console.log('REQ.SESSION.LOGGEDIN', req.session.loggedIn);
   if (req.session.loggedIn) {
-    next();
+    res.redirect('/users');;
     return;
   }
   res.redirect('/');
