@@ -21,11 +21,12 @@ app.use(express.urlencoded({ extended:true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(socialNetworkRoutes);
 
+const PORT = process.env.APP_PORT || 80;
 
 async function main() {
   try {
     await startMySqlPool();
-    app.listen(process.env.APP_PORT, () => {
+    app.listen(PORT), () => {
       console.log(`Server has been started on port ${process.env.APP_PORT}`);
     });
   } catch (e) {

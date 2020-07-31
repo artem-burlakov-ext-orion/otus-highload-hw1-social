@@ -7,6 +7,9 @@
     "start": "node index",
     "dev": "nodemon index"
   },
+  "engines": {
+    "node": "14.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eifory/otus-highload-hw1-social.git"
