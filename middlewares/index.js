@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 
 const {
+  addUser,
   getFriendsUserAdded,
   getNotUserFriends,
   getUserMutualFriends
@@ -22,10 +23,7 @@ const register = async (req, res, next) => {
     const { login, name, surname, age, hobbies, gender, city } = req.body;
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = { name, surname, age, hobbies, gender, city, login, password: hashedPassword };
-    const sql = `INSERT INTO users(name, surname, age, hobbies, gender, city, login, password)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    const data = Object.values(user);
-    await pool.query(sql, data);
+    await addUser(user);
     res.redirect('/');
   } catch (e) {
     console.log(e);
@@ -79,9 +77,7 @@ const auth = async (req, res, next) => {
 
 const logout = (req, res, next) => {
   console.log('LOGOUT');
-  console.log(req.session);
   req.session.destroy();
-  console.log(req.session);
   next();
 };
 

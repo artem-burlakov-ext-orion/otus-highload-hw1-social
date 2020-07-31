@@ -1,3 +1,11 @@
+const addUser = async (user) => {
+  const sql = `INSERT INTO users(name, surname, age, hobbies, gender, city, login, password)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const data = Object.values(user);
+  await pool.query(sql, data);
+};
+
+
 const getFriendsUserAdded = async (id) => {
   const sql = `SELECT u.id, f.userId=? AS isFriendForMe, u.name AS username, u.surname, u.age, u.hobbies, u.gender, u.city
                 FROM users AS u LEFT JOIN friends AS f
@@ -47,6 +55,7 @@ const getNotUserFriends = async (id, userFriendsId) => {
 };
 
 module.exports = {
+  addUser,
   getFriendsUserAdded,
   getUserMutualFriends,
   getNotUserFriends

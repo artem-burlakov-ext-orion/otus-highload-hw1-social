@@ -1,8 +1,7 @@
 require('dotenv').config();
-
 const {Router} = require('express');
+const session = require('express-session');
 
-const router = Router();
 const { 
   isAuth,
   register,
@@ -10,7 +9,10 @@ const {
   auth,
   logout
  } = require('../middlewares/index');
-const session = require('express-session');
+
+const router = Router();
+
+
 
 router.use(session({
 	secret: process.env.SESSION_SECRET,
@@ -18,12 +20,8 @@ router.use(session({
 	saveUninitialized: true
 }));
 
-router.get('/', (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect('/users');
-    return;
-  }
-  res.render('login');
+router.get('/', isAuth, (req, res) => {
+  res.redirect('/users');
 });
 
 router.post('/auth', auth);
@@ -36,7 +34,7 @@ router.get('/register', (req, res) => {
   });
 });
 
-router.get('/logout', logout, (req, res) => {
+router.get('/logout', isAuth, logout, (req, res) => {
   res.redirect('/');
 })
 
@@ -122,7 +120,6 @@ router.post('/friend', async (req, res) => {
       const data5 = toInsertNotMutual;
       console.log('ADD NOT MUTUAL TO INSERT', data5);
       const result = await pool.query(sql5, [data5]);
-      console.log(result[0]);
     }
   }
   res.redirect('/users');
