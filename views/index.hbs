@@ -1,0 +1,31 @@
+<h2>Nice to see you, {{login}}</h2>
+
+{{#if users.length}}
+<form class="col s8" action="/friend" method="post">
+  <ul>
+    {{#each users}}
+      <li class="profile">
+        <label>
+          
+          {{#if isFriendForMe}}
+            <input type="hidden" name="friendsData" value="{{id}}">
+            <input type="checkbox" name="friendsData" value="x" checked>
+          {{else}}
+            <input type="checkbox" name="newFriends" value="{{id}}">
+          {{/if}}
+          <span>{{name}}</span>
+          <span>{{surname}}</span>
+          <span>{{age}}</span>
+          <span>{{gender}}</span>
+          <span>{{city}}</span>
+          
+        </label>
+      </li>
+    {{/each}}
+    <button type="submit" class="btn btn-small" >Save changes</button>
+  </ul>
+  
+</form>
+{{else}}
+<p>No users!</p>
+{{/if}}
