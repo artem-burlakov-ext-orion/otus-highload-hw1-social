@@ -1,3 +1,4 @@
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 
 const {
@@ -20,7 +21,7 @@ const isAuth = (req, res, next) => {
 const registerUser = async (req, res, next) => {
   try {
     const { login, name, surname, age, hobbies, gender, city } = req.body;
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.password, process.env.BCRYPT_SALT_ROUNDS);
     const user = { name, surname, age, hobbies, gender, city, login, password: hashedPassword };
     await addUserToDb(user);
     res.redirect('/');
