@@ -1,4 +1,4 @@
-const addUser = async (user) => {
+const addUserToDb = async (user) => {
   const sql = `INSERT INTO users(name, surname, age, hobbies, gender, city, login, password)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
   const data = Object.values(user);
@@ -54,9 +54,19 @@ const getNotUserFriends = async (id, userFriendsId) => {
   }
 };
 
+const findUserByLogin = async (login) => {
+  const sql = `SELECT id, login, password
+               FROM users
+               WHERE login=?`;
+  const data = [login];
+  const user = await pool.query(sql, data);
+  return user[0];
+};
+
 module.exports = {
-  addUser,
+  addUserToDb,
   getFriendsUserAdded,
   getUserMutualFriends,
-  getNotUserFriends
+  getNotUserFriends,
+  findUserByLogin
 }

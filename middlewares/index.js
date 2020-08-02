@@ -1,32 +1,33 @@
 const bcrypt = require('bcrypt');
 
 const {
-  addUser,
+  addUserToDb,
   getFriendsUserAdded,
   getNotUserFriends,
-  getUserMutualFriends
+  getUserMutualFriends,
+  findUserByLogin
 } = require('../sql/index');
 
 
 const isAuth = (req, res, next) => {
   console.log('REQ.SESSION.LOGGEDIN', req.session.loggedIn);
   if (req.session.loggedIn) {
-    res.redirect('/users');
+    next();
     return;
   }
   res.render('login');
 };
 
 
-const register = async (req, res, next) => {
+const registerUser = async (req, res, next) => {
   try {
     const { login, name, surname, age, hobbies, gender, city } = req.body;
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = { name, surname, age, hobbies, gender, city, login, password: hashedPassword };
-    await addUser(user);
+    await addUserToDb(user);
     res.redirect('/');
   } catch (e) {
-    console.log(e);
+    return e;
   }
 };
 
@@ -53,18 +54,35 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
-const auth = async (req, res, next) => {
-  const { login, password } = req.body;
+const isUserExist = (user) => {
+  return user.length !== 0;
+};
+
+const isPasswordCorrect = async (inputPassword, userPassword) => {
   try {
-    const sql = `SELECT id, login, password
-                 FROM users
-                 WHERE login=?`;
-    const data = [login];
-    const user = await pool.query(sql, data);
-    if ((user[0].length !== 0) && (await bcrypt.compare(password, user[0][0].password))) {
-      req.session.loggedIn = true;
-      req.session.login = login;
-      req.session.userId = user[0][0].id;
+    const isCorrect = await bcrypt.compare(inputPassword, userPassword);
+    return isCorrect;
+  } catch (e) {
+    return e;
+  }
+};
+
+const isUserCorrect = async (user, inputPassword) => {
+  return isUserExist(user) && await isPasswordCorrect(inputPassword, user[0].password);
+};
+
+const signInUser = (req, user) => {
+  req.session.loggedIn = true;
+  req.session.login = user.login;
+  req.session.userId = user.id;
+};
+
+const checkUser = async (req, res, next) => {
+  const { login: inputLogin, password: inputPassword } = req.body;
+  try {
+    const user = await findUserByLogin(inputLogin);
+    if (await isUserCorrect(user, inputPassword)) {
+      signInUser(req, user[0]);
       console.log('AUTH', req.session);
       res.redirect('/users');
       return;
@@ -75,16 +93,17 @@ const auth = async (req, res, next) => {
   } 
 };
 
-const logout = (req, res, next) => {
+const logoutUser = (req, res, next) => {
   console.log('LOGOUT');
   req.session.destroy();
+  res.redirect('/');
   next();
 };
 
 module.exports = {
   isAuth,
-  register,
+  registerUser,
   getAllUsers,
-  auth,
-  logout
+  checkUser,
+  logoutUser
 }

@@ -4,15 +4,13 @@ const session = require('express-session');
 
 const { 
   isAuth,
-  register,
+  registerUser,
   getAllUsers,
-  auth,
-  logout
+  checkUser,
+  logoutUser
  } = require('../middlewares/index');
 
 const router = Router();
-
-
 
 router.use(session({
 	secret: process.env.SESSION_SECRET,
@@ -20,9 +18,11 @@ router.use(session({
 	saveUninitialized: true
 }));
 
-router.get('/', isAuth);
+router.get('/', isAuth, (req, res) => {
+  res.redirect('/users');
+});
 
-router.post('/auth', auth);
+router.post('/auth', checkUser);
 
 router.get('/users', isAuth, getAllUsers);
  
@@ -32,12 +32,9 @@ router.get('/register', (req, res) => {
   });
 });
 
-router.get('/logout', isAuth, logout, (req, res) => {
-  res.redirect('/');
-})
+router.get('/logout', isAuth, logoutUser);
 
-router.post('/register', register);
-  
+router.post('/register', registerUser);
 
 router.post('/friend', async (req, res) => {
   const id = req.session.userId;
