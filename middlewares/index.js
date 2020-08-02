@@ -10,14 +10,12 @@ const {
 
 
 const isAuth = (req, res, next) => {
-  console.log('REQ.SESSION.LOGGEDIN', req.session.loggedIn);
   if (req.session.loggedIn) {
     next();
     return;
   }
   res.render('login');
 };
-
 
 const registerUser = async (req, res, next) => {
   try {
@@ -71,10 +69,11 @@ const isUserCorrect = async (user, inputPassword) => {
   return isUserExist(user) && await isPasswordCorrect(inputPassword, user[0].password);
 };
 
-const signInUser = (req, user) => {
+const loginUser = (req, res, next) => {
   req.session.loggedIn = true;
-  req.session.login = user.login;
-  req.session.userId = user.id;
+  req.session.login = req.session.user.login;
+  req.session.userId = req.session.user.id;
+  res.redirect('/users');
 };
 
 const checkUser = async (req, res, next) => {
@@ -82,9 +81,8 @@ const checkUser = async (req, res, next) => {
   try {
     const user = await findUserByLogin(inputLogin);
     if (await isUserCorrect(user, inputPassword)) {
-      signInUser(req, user[0]);
-      console.log('AUTH', req.session);
-      res.redirect('/users');
+      req.session.user = user[0];
+      next();
       return;
     }
     res.send('Incorrect Username and/or Password!');
@@ -94,10 +92,8 @@ const checkUser = async (req, res, next) => {
 };
 
 const logoutUser = (req, res, next) => {
-  console.log('LOGOUT');
   req.session.destroy();
   res.redirect('/');
-  next();
 };
 
 module.exports = {
@@ -105,5 +101,6 @@ module.exports = {
   registerUser,
   getAllUsers,
   checkUser,
-  logoutUser
+  logoutUser,
+  loginUser
 }

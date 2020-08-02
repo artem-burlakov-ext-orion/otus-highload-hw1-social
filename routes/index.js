@@ -7,7 +7,8 @@ const {
   registerUser,
   getAllUsers,
   checkUser,
-  logoutUser
+  logoutUser,
+  loginUser
  } = require('../middlewares/index');
 
 const router = Router();
@@ -22,7 +23,7 @@ router.get('/', isAuth, (req, res) => {
   res.redirect('/users');
 });
 
-router.post('/auth', checkUser);
+router.post('/auth', checkUser, loginUser);
 
 router.get('/users', isAuth, getAllUsers);
  
