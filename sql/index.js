@@ -5,7 +5,6 @@ const addUserToDb = async (user) => {
   await pool.query(sql, data);
 };
 
-
 const getFriendsUserAdded = async (id) => {
   const sql = `SELECT u.id, f.userId=? AS isFriendForMe, u.name AS username, u.surname, u.age, u.hobbies, u.gender, u.city
                 FROM users AS u LEFT JOIN friends AS f
