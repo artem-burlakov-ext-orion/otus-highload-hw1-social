@@ -62,10 +62,79 @@ const findUserByLogin = async (login) => {
   return user[0];
 };
 
+const deleteMutualFriendsWhoAddedMeFirst = async (id, unFriendList) => {
+  const sql = `UPDATE friends
+               SET isMutual=?
+               WHERE friendId=? AND isMutual=? AND userId IN (?)`;
+  const data = [0, id, 1, unFriendList];
+  await pool.query(sql, data);
+};
+
+const getMutualFriendsIAddedFirst = async (id, unFriendList) => {
+  const sql = `SELECT friendId FROM friends
+               WHERE userId=? AND isMutual=? AND friendId IN (?)`;
+  const data = [id, 1, unFriendList];
+  const mutualFriendsIAddedFirst = await pool.query(sql, data);
+  return mutualFriendsIAddedFirst[0];
+}
+
+const addMeAsFriendAndUnfriendListAsUser = async(toInsert) => {
+  const sql = `INSERT INTO friends(userId, friendId)
+               VALUES ?`; 
+  await pool.query(sql, [toInsert]);
+};
+
+const deleteAllInUnfriendList = async (id, toDelete) => {
+  const sql = `DELETE FROM friends
+               WHERE userId=? AND friendId IN (?)`;
+  const data = [id, toDelete];
+  await pool.query(sql, data);
+};
+
+const getAllNotMutualWhoAddedMeFirst = async (id, newFriendList) => {
+  const sql = `SELECT id, userId FROM friends
+               WHERE friendId=? AND isMutual=? AND userId IN (?)`;
+  const data = [id, 0, newFriendList];
+  const allWhoAddedMeFirst = await pool.query(sql, data);
+  return allWhoAddedMeFirst[0];
+};
+
+const getAllWhoInNewFriendListAndAddedMeFirst = async (id, newFriendList) => {
+  const sql = `SELECT id, userId 
+               FROM friends
+               WHERE friendId=? AND userId IN (?)`;
+  const data = [id, newFriendList];
+  const result = await pool.query(sql, data);
+  return result[0];
+}
+
+const updateNotMutualWhoAddedMeFirstToMutual = async (updateList) => {
+  const sql = `UPDATE friends
+               SET isMutual=?
+               WHERE id IN (?)`;
+  const data = [1, updateList];
+  await pool.query(sql, data);
+}
+
+const addAllWhoNotAddedMeFirst = async (toInsert) => {
+  console.log('TOINSERT', toInsert);
+  const sql = `INSERT INTO friends(userId, friendId)
+               VALUES ?`;
+  await pool.query(sql, [toInsert]);
+}
+
 module.exports = {
   addUserToDb,
   getFriendsUserAdded,
   getUserMutualFriends,
   getNotUserFriends,
-  findUserByLogin
+  findUserByLogin,
+  deleteMutualFriendsWhoAddedMeFirst,
+  getMutualFriendsIAddedFirst,
+  addMeAsFriendAndUnfriendListAsUser,
+  deleteAllInUnfriendList,
+  getAllNotMutualWhoAddedMeFirst,
+  updateNotMutualWhoAddedMeFirstToMutual,
+  getAllWhoInNewFriendListAndAddedMeFirst,
+  addAllWhoNotAddedMeFirst
 }

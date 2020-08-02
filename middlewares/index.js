@@ -6,7 +6,14 @@ const {
   getFriendsUserAdded,
   getNotUserFriends,
   getUserMutualFriends,
-  findUserByLogin
+  findUserByLogin,
+  deleteMutualFriendsWhoAddedMeFirst,
+  getMutualFriendsIAddedFirst,
+  addMeAsFriendAndUnfriendListAsUser,
+  deleteAllInUnfriendList,
+  getAllWhoInNewFriendListAndAddedMeFirst,
+  updateNotMutualWhoAddedMeFirstToMutual,
+  addAllWhoNotAddedMeFirst
 } = require('../sql/index');
 
 
@@ -97,11 +104,99 @@ const logoutUser = (req, res, next) => {
   res.redirect('/');
 };
 
+const getUnfriendList = (data) => {
+  if (data) {
+    return Array.from(data)
+      .filter((id, i) => id !=='x' && data[i + 1] !=='x')
+      .map((id) => Number(id));
+  }
+};
+
+const getInsertData = (friendsList) => {
+  let insertData = [];
+  if (friendsList.length !== 0 ) {
+    const friendsIdList = friendsList
+      .map((friend) => friend.friendId);
+    friendsIdList.forEach((friendId) => {
+      insertData.push([friendId, id]);
+    });
+  }
+  return insertData;
+};
+
+const allDeleteFriendsOpsDone = async (id, unFriendList) => {
+  if (unFriendList.length === 0) {
+    return;
+  }
+  try {
+    await deleteMutualFriendsWhoAddedMeFirst(id, unFriendList);
+    const mutualFriendsIaddedFirstLocatedInUnfriendList = await getMutualFriendsIAddedFirst(id, unFriendList);
+    const insertData = getInsertData(mutualFriendsIaddedFirstLocatedInUnfriendList);
+    if (insertData.length !==0 ) {
+      await addMeAsFriendAndUnfriendListAsUser(insertData);
+    }
+    await deleteAllInUnfriendList(id, unFriendList);
+  } catch (e) {
+    return e;
+  }
+};
+
+const deleteFriends = async (req, res, next) => {
+  const { unFriendData } = req.body;
+  if (!unFriendData) {
+    next();
+    return;
+  }
+  const unFriendList = getUnfriendList(unFriendData);
+  try {
+    await allDeleteFriendsOpsDone(req.session.userId, unFriendList);
+    next();
+  } catch (e) {
+    return e;
+  }
+};
+
+const addFriends = async (req, res, next) => {
+  const { newFriends } = req.body;
+  if (!newFriends) {
+    next();
+    return;
+  }
+  const newFriendList = Array.from(newFriends)
+    .map((newFriend) => Number(newFriend));
+  console.log('TOADD', newFriendList);
+  if(newFriendList.length === 0 ) {
+    next();
+    return;
+  }
+  const whoAddedMeAndInNewFriendList = await getAllWhoInNewFriendListAndAddedMeFirst(req.session.userId, newFriendList);
+  const updateListIds = whoAddedMeAndInNewFriendList
+    .map((elem) => elem.id);
+  const excludeListUserIds = whoAddedMeAndInNewFriendList
+    .map((elem) => elem.userId);
+  if (updateListIds.length !== 0) {
+    await updateNotMutualWhoAddedMeFirstToMutual(updateListIds);
+  }
+  const insertListFriendIds = newFriendList
+    .filter((newFriendId) => !excludeListUserIds.includes(newFriendId));
+  if (insertListFriendIds.length !== 0 ) {
+    let toInsert = [];
+    insertListFriendIds.forEach((friendId) => {
+      toInsert.push([req.session.userId, friendId]);
+    });
+    await addAllWhoNotAddedMeFirst(toInsert);
+  }
+  next();
+};
+
+
 module.exports = {
   isAuth,
   registerUser,
   getAllUsers,
   checkUser,
   logoutUser,
-  loginUser
+  loginUser,
+  deleteFriends,
+  addFriends
 }

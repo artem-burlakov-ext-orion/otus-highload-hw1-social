@@ -16,14 +16,13 @@ app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', 'views');
 
-
 app.use(express.urlencoded({ extended:true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(socialNetworkRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-async function main() {
+(async () => {
   try {
     await startMySqlPool();
     app.listen(PORT, () => {
@@ -32,6 +31,4 @@ async function main() {
   } catch (e) {
     console.log(e);
   }
-};
-
-main();
+})();

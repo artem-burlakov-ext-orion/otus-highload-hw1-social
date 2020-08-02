@@ -8,8 +8,8 @@
       <li class="profile">
         <label>
           {{#if isFriendForMe}}
-            <input type="hidden" name="friendsData" value="{{id}}">
-            <input type="checkbox" name="friendsData" value="x" checked>
+            <input type="hidden" name="unFriendData" value="{{id}}">
+            <input type="checkbox" name="unFriendData" value="x" checked>
           {{else}}
             <input type="checkbox" name="newFriends" value="{{id}}">
           {{/if}}
