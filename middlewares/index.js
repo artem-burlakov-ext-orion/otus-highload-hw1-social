@@ -31,9 +31,10 @@ const registerUser = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(req.body.password, Number(process.env.BCRYPT_SALT_ROUNDS));
     const user = { name, surname, age, hobbies, gender, city, login, password: hashedPassword };
     await addUserToDb(user);
+    res.status = 201;
     res.redirect('/');
   } catch (e) {
-    return e;
+    next(e);
   }
 };
 
@@ -50,13 +51,15 @@ const getAllUsers = async (req, res, next) => {
     console.log('NOT', notUserFriends);
     const users = userFriends.concat(notUserFriends);
 
+    res.status(200);
     res.render('index', {
       title: 'Social network',
       users,
       login
+
     });
   } catch (e) {
-    return e;
+    next(e);
   }
 };
 
@@ -74,7 +77,11 @@ const isPasswordCorrect = async (inputPassword, userPassword) => {
 };
 
 const isUserCorrect = async (user, inputPassword) => {
-  return isUserExist(user) && await isPasswordCorrect(inputPassword, user[0].password);
+  try {
+    return isUserExist(user) && await isPasswordCorrect(inputPassword, user[0].password);
+  } catch (e) {
+    return e;
+  }
 };
 
 const loginUser = (req, res, next) => {
@@ -93,14 +100,16 @@ const checkUser = async (req, res, next) => {
       next();
       return;
     }
+    res.status = 401;
     res.send('Incorrect Username and/or Password!');
   } catch(e) {
-    return e;
+    next(e);
   } 
 };
 
 const logoutUser = (req, res, next) => {
   req.session.destroy();
+  res.status = 200;
   res.redirect('/');
 };
 
@@ -152,7 +161,7 @@ const deleteFriends = async (req, res, next) => {
     await allDeleteFriendsOpsDone(req.session.userId, unFriendList);
     next();
   } catch (e) {
-    return e;
+    next(e);
   }
 };
 
@@ -170,24 +179,28 @@ const addFriends = async (req, res, next) => {
     next();
     return;
   }
-  const whoAddedMeAndInNewFriendList = await getAllWhoInNewFriendListAndAddedMeFirst(req.session.userId, newFriendList);
-  const updateListIds = whoAddedMeAndInNewFriendList
-    .map((elem) => elem.id);
-  const excludeListUserIds = whoAddedMeAndInNewFriendList
-    .map((elem) => elem.userId);
-  if (updateListIds.length !== 0) {
-    await updateNotMutualWhoAddedMeFirstToMutual(updateListIds);
+  try {
+    const whoAddedMeAndInNewFriendList = await getAllWhoInNewFriendListAndAddedMeFirst(req.session.userId, newFriendList);
+    const updateListIds = whoAddedMeAndInNewFriendList
+      .map((elem) => elem.id);
+    const excludeListUserIds = whoAddedMeAndInNewFriendList
+      .map((elem) => elem.userId);
+    if (updateListIds.length !== 0) {
+      await updateNotMutualWhoAddedMeFirstToMutual(updateListIds);
+    }
+    const insertListFriendIds = newFriendList
+      .filter((newFriendId) => !excludeListUserIds.includes(newFriendId));
+    if (insertListFriendIds.length !== 0 ) {
+      let toInsert = [];
+      insertListFriendIds.forEach((friendId) => {
+        toInsert.push([req.session.userId, friendId]);
+      });
+      await addAllWhoNotAddedMeFirst(toInsert);
+    }
+    next();
+  } catch (e) {
+    next(e);
   }
-  const insertListFriendIds = newFriendList
-    .filter((newFriendId) => !excludeListUserIds.includes(newFriendId));
-  if (insertListFriendIds.length !== 0 ) {
-    let toInsert = [];
-    insertListFriendIds.forEach((friendId) => {
-      toInsert.push([req.session.userId, friendId]);
-    });
-    await addAllWhoNotAddedMeFirst(toInsert);
-  }
-  next();
 };
 
 

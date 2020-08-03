@@ -43,4 +43,13 @@ router.post('/friend', deleteFriends, addFriends, (req, res) => {
   res.redirect('/users');
 });
 
+router.use((req, res, next) => {
+  const error = new Error('Not found');
+  next(error);
+});
+
+router.use((error, req, res, next) => {
+  res.send(error.message);
+});
+
 module.exports = router;
