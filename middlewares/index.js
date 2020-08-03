@@ -46,8 +46,8 @@ const registerUser = async (req, res, next) => {
       gender,
       city,
       login,
-      password: hashedPassword,
     };
+    user.password = hashedPassword;
     await addUserToDb(user);
     res.status = 201;
     res.redirect('/');
@@ -149,7 +149,7 @@ const getInsertData = (friendsList, id) => {
   return insertData;
 };
 
-const allDeleteFriendsOpsDone = async (id, unFriendList) => {
+const allDeleteFriendsOps = async (id, unFriendList) => {
   if (unFriendList.length === 0) {
     return;
   }
@@ -175,14 +175,14 @@ const deleteFriends = async (req, res, next) => {
   const unFriendList = getUnfriendList(unFriendData);
   console.log('UNFRIEND_LIST', unFriendList);
   try {
-    await allDeleteFriendsOpsDone(req.session.userId, unFriendList);
+    await allDeleteFriendsOps(req.session.userId, unFriendList);
     next();
   } catch (e) {
     next(e);
   }
 };
 
-const allAddFriendsOpsDone = async (userId, newFriendList) => {
+const allAddFriendsOps = async (userId, newFriendList) => {
   try {
     const addMeFirstList = await getWhoInNewFriendListAndAddMeFirst(userId, newFriendList);
     const updateListIds = addMeFirstList
@@ -221,7 +221,7 @@ const addFriends = async (req, res, next) => {
     return;
   }
   try {
-    await allAddFriendsOpsDone(req.session.userId, newFriendList);
+    await allAddFriendsOps(req.session.userId, newFriendList);
     next();
   } catch (e) {
     next(e);
