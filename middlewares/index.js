@@ -165,22 +165,9 @@ const deleteFriends = async (req, res, next) => {
   }
 };
 
-const addFriends = async (req, res, next) => {
-  const { newFriends } = req.body;
-  if (!newFriends) {
-    next();
-    return;
-  }
-  console.log('NEWF', newFriends);
-  const newFriendArr = Array.isArray(newFriends) ? newFriends : [newFriends];
-  const newFriendList = newFriendArr.map((newFriend) => Number(newFriend));
-  console.log('TOADD', newFriendList);
-  if(newFriendList.length === 0 ) {
-    next();
-    return;
-  }
+const allAddFriendsOpsDone = async (userId, newFriendList) => {
   try {
-    const whoAddedMeAndInNewFriendList = await getAllWhoInNewFriendListAndAddedMeFirst(req.session.userId, newFriendList);
+    const whoAddedMeAndInNewFriendList = await getAllWhoInNewFriendListAndAddedMeFirst(userId, newFriendList);
     const updateListIds = whoAddedMeAndInNewFriendList
       .map((elem) => elem.id);
     const excludeListUserIds = whoAddedMeAndInNewFriendList
@@ -197,12 +184,32 @@ const addFriends = async (req, res, next) => {
       });
       await addAllWhoNotAddedMeFirst(toInsert);
     }
+  } catch (e) {
+    return e;
+  }
+};
+
+const addFriends = async (req, res, next) => {
+  const { newFriends } = req.body;
+  if (!newFriends) {
+    next();
+    return;
+  }
+  console.log('NEWF', newFriends);
+  const newFriendArr = Array.isArray(newFriends) ? newFriends : [newFriends];
+  const newFriendList = newFriendArr.map((newFriend) => Number(newFriend));
+  console.log('TOADD', newFriendList);
+  if(newFriendList.length === 0 ) {
+    next();
+    return;
+  }
+  try {
+    await allAddFriendsOpsDone(req.session.userId, newFriendList);
     next();
   } catch (e) {
     next(e);
   }
 };
-
 
 module.exports = {
   isAuth,

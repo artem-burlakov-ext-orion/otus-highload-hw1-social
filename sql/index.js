@@ -71,7 +71,8 @@ const deleteMutualFriendsWhoAddedMeFirst = async (id, unFriendList) => {
 };
 
 const getMutualFriendsIAddedFirst = async (id, unFriendList) => {
-  const sql = `SELECT friendId FROM friends
+  const sql = `SELECT friendId
+               FROM friends
                WHERE userId=? AND isMutual=? AND friendId IN (?)`;
   const data = [id, 1, unFriendList];
   const mutualFriendsIAddedFirst = await pool.query(sql, data);
@@ -92,7 +93,8 @@ const deleteAllInUnfriendList = async (id, toDelete) => {
 };
 
 const getAllNotMutualWhoAddedMeFirst = async (id, newFriendList) => {
-  const sql = `SELECT id, userId FROM friends
+  const sql = `SELECT id, userId
+               FROM friends
                WHERE friendId=? AND isMutual=? AND userId IN (?)`;
   const data = [id, 0, newFriendList];
   const allWhoAddedMeFirst = await pool.query(sql, data);
