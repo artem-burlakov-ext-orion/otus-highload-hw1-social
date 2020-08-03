@@ -105,11 +105,10 @@ const logoutUser = (req, res, next) => {
 };
 
 const getUnfriendList = (data) => {
-  if (data) {
-    return Array.from(data)
-      .filter((id, i) => id !=='x' && data[i + 1] !=='x')
-      .map((id) => Number(id));
-  }
+  const result =  Array.isArray(data) ? data : [data];
+  return result
+    .filter((id, i) => id !=='x' && data[i + 1] !=='x')
+    .map((id) => Number(id));
 };
 
 const getInsertData = (friendsList) => {
@@ -148,6 +147,7 @@ const deleteFriends = async (req, res, next) => {
     return;
   }
   const unFriendList = getUnfriendList(unFriendData);
+  console.log('UNFRIEND_LIST', unFriendList);
   try {
     await allDeleteFriendsOpsDone(req.session.userId, unFriendList);
     next();
