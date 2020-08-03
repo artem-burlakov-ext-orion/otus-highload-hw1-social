@@ -24,31 +24,33 @@ const isAuth = (req, res, next) => {
   res.render('login');
 };
 
+const setHashedPassword = async (user, password) => {
+  const hashedPassword = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT_ROUNDS));
+  return { ...user, password: hashedPassword };
+};
+
 const registerUser = async (req, res, next) => {
+  const {
+    name,
+    surname,
+    age,
+    hobbies,
+    gender,
+    city,
+    login,
+    password,
+  } = req.body;
+  const user = {
+    name,
+    surname,
+    age,
+    hobbies,
+    gender,
+    city,
+    login,
+  };
   try {
-    const hashedPassword = await bcrypt.hash(
-      req.body.password, Number(process.env.BCRYPT_SALT_ROUNDS),
-    );
-    const {
-      name,
-      surname,
-      age,
-      hobbies,
-      gender,
-      city,
-      login,
-    } = req.body;
-    const user = {
-      name,
-      surname,
-      age,
-      hobbies,
-      gender,
-      city,
-      login,
-    };
-    user.password = hashedPassword;
-    await addUserToDb(user);
+    await addUserToDb(await setHashedPassword(user, password));
     res.status = 201;
     res.redirect('/');
   } catch (e) {
