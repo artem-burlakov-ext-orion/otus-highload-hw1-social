@@ -163,7 +163,7 @@ const addFriends = async (req, res, next) => {
     return;
   }
   console.log('NEWF', newFriends);
-  const newFriends = Array.isArray(newFriends) ? newFriends : [newFriends];
+  newFriends = Array.isArray(newFriends) ? newFriends : [newFriends];
   const newFriendList = newFriends.map((newFriend) => Number(newFriend));
   console.log('TOADD', newFriendList);
   if(newFriendList.length === 0 ) {
