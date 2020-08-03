@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index",
     "dev": "nodemon index",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "fix": "eslint --fix ."
   },
   "engines": {
     "node": "14.x"

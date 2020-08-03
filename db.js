@@ -1,18 +1,17 @@
 require('dotenv').config();
-const mysql = require("mysql2/promise");
+const mysql = require('mysql2/promise');
 
-const startMySqlPool = async () => {
+exports.default = (async () => {
   try {
-    global.pool = await mysql.createPool({
+    const pool = await mysql.createPool({
       connectionLimit: Number(process.env.CONN_LIMIT),
       host: process.env.HOST,
       user: process.env.DB_USER,
       database: process.env.DB_NAME,
-      password: process.env.DB_PASSWORD
+      password: process.env.DB_PASSWORD,
     });
+    return pool;
   } catch (e) {
     return e;
   }
-};
-
-module.exports = startMySqlPool;
+})();

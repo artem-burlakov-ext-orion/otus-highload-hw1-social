@@ -1,3 +1,5 @@
+const pool = require('../db');
+
 const addUserToDb = async (user) => {
   const sql = `INSERT INTO users(name, surname, age, hobbies, gender, city, login, password)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -10,13 +12,13 @@ const getFriendsUserAdded = async (id) => {
                 FROM users AS u LEFT JOIN friends AS f
                 ON u.id = f.friendId
                 WHERE f.userId=? AND u.id <> ?`;
-    const data = [id, id, id];
-    try {
-      const friends = await pool.query(sql, data);
-      return friends[0];
-    } catch (e) {
-      return e;
-    }
+  const data = [id, id, id];
+  try {
+    const friends = await pool.query(sql, data);
+    return friends[0];
+  } catch (e) {
+    return e;
+  }
 };
 
 const getUserMutualFriends = async (id) => {
@@ -38,17 +40,17 @@ const getNotUserFriends = async (id, userFriendsId) => {
            FROM users AS u LEFT JOIN friends AS f
            ON u.id = f.friendId
            WHERE u.id <> ?`;
-  let data = [id, id];
-  
+  const data = [id, id];
+
   if (userFriendsId.length !== 0) {
     sql = `${sql} AND u.id NOT IN (?)`;
     data.push(userFriendsId);
   }
-  
+
   try {
     const notUserFriends = await pool.query(sql, data);
     return notUserFriends[0];
-   } catch (e) {
+  } catch (e) {
     return e;
   }
 };
@@ -70,18 +72,18 @@ const deleteMutualFriendsWhoAddedMeFirst = async (id, unFriendList) => {
   await pool.query(sql, data);
 };
 
-const getMutualFriendsIAddedFirst = async (id, unFriendList) => {
+const getMutualFriendsIAddFirst = async (id, unFriendList) => {
   const sql = `SELECT friendId
                FROM friends
                WHERE userId=? AND isMutual=? AND friendId IN (?)`;
   const data = [id, 1, unFriendList];
   const mutualFriendsIAddedFirst = await pool.query(sql, data);
   return mutualFriendsIAddedFirst[0];
-}
+};
 
-const addMeAsFriendAndUnfriendListAsUser = async(toInsert) => {
+const addMeAsFriendAndUnfriendListAsUser = async (toInsert) => {
   const sql = `INSERT INTO friends(userId, friendId)
-               VALUES ?`; 
+               VALUES ?`;
   await pool.query(sql, [toInsert]);
 };
 
@@ -101,14 +103,14 @@ const getAllNotMutualWhoAddedMeFirst = async (id, newFriendList) => {
   return allWhoAddedMeFirst[0];
 };
 
-const getAllWhoInNewFriendListAndAddedMeFirst = async (id, newFriendList) => {
+const getWhoInNewFriendListAndAddMeFirst = async (id, newFriendList) => {
   const sql = `SELECT id, userId 
                FROM friends
                WHERE friendId=? AND userId IN (?)`;
   const data = [id, newFriendList];
   const result = await pool.query(sql, data);
   return result[0];
-}
+};
 
 const updateNotMutualWhoAddedMeFirstToMutual = async (updateList) => {
   const sql = `UPDATE friends
@@ -116,14 +118,14 @@ const updateNotMutualWhoAddedMeFirstToMutual = async (updateList) => {
                WHERE id IN (?)`;
   const data = [1, updateList];
   await pool.query(sql, data);
-}
+};
 
 const addAllWhoNotAddedMeFirst = async (toInsert) => {
   console.log('TOINSERT', toInsert);
   const sql = `INSERT INTO friends(userId, friendId)
                VALUES ?`;
   await pool.query(sql, [toInsert]);
-}
+};
 
 module.exports = {
   addUserToDb,
@@ -132,11 +134,11 @@ module.exports = {
   getNotUserFriends,
   findUserByLogin,
   deleteMutualFriendsWhoAddedMeFirst,
-  getMutualFriendsIAddedFirst,
+  getMutualFriendsIAddFirst,
   addMeAsFriendAndUnfriendListAsUser,
   deleteAllInUnfriendList,
   getAllNotMutualWhoAddedMeFirst,
   updateNotMutualWhoAddedMeFirstToMutual,
-  getAllWhoInNewFriendListAndAddedMeFirst,
-  addAllWhoNotAddedMeFirst
-}
+  getWhoInNewFriendListAndAddMeFirst,
+  addAllWhoNotAddedMeFirst,
+};
