@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "dev": "nodemon index"
+    "dev": "nodemon index",
+    "lint": "eslint ."
   },
   "engines": {
     "node": "14.x"
@@ -27,5 +28,10 @@
     "express-handlebars": "^5.1.0",
     "express-session": "^1.17.1",
     "mysql2": "^2.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.6.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "^2.22.0"
   }
 }
