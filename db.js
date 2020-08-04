@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 
 const createMysqlPool = async () => {
   try {
-    const pool = await mysql.createPool({
+    global.pool = await mysql.createPool({
       connectionLimit: Number(process.env.CONN_LIMIT),
       host: process.env.HOST,
       user: process.env.DB_USER,
@@ -17,4 +17,4 @@ const createMysqlPool = async () => {
   }
 };
 
-exports.module = createMysqlPool;
+module.exports = createMysqlPool;
