@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 
-exports.default = (async () => {
+const createMysqlPool = async () => {
   try {
     const pool = await mysql.createPool({
       connectionLimit: Number(process.env.CONN_LIMIT),
@@ -15,4 +15,6 @@ exports.default = (async () => {
   } catch (e) {
     return e;
   }
-})();
+};
+
+exports.module = createMysqlPool;
