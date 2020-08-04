@@ -30,25 +30,18 @@ const setHashedPassword = async (user, password) => {
 };
 
 const registerUser = async (req, res, next) => {
-  const {
-    name,
-    surname,
-    age,
-    hobbies,
-    gender,
-    city,
-    login,
-    password,
-  } = req.body;
   const user = {
-    name,
-    surname,
-    age,
-    hobbies,
-    gender,
-    city,
-    login,
+    name: req.body.name,
+    surname: req.body.surname,
+    age: req.body.age,
+    hobbies: req.body.hobbies,
+    gender: req.body.gender,
+    city: req.body.city,
+    login: req.body.login,
   };
+
+  const { password } = req.body;
+
   try {
     await addUserToDb(await setHashedPassword(user, password));
     res.status = 201;
