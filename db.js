@@ -10,6 +10,7 @@ exports.default = (async () => {
       database: process.env.DB_NAME,
       password: process.env.DB_PASSWORD,
     });
+    console.log('MYSQL POOL CREATED');
     return pool;
   } catch (e) {
     return e;
