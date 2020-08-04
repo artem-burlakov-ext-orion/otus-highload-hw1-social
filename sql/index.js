@@ -1,3 +1,7 @@
+const createPool = require('../db');
+
+const pool = createPool();
+
 const addUserToDb = async (user) => {
   const sql = `INSERT INTO users(name, surname, age, hobbies, gender, city, login, password)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
