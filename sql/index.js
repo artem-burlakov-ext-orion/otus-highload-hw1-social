@@ -137,7 +137,7 @@ const getSearchResultSql = async (data) => {
                LIMIT 10`;
   const result = await pool.query(sql, data);
   return result[0];
-}
+};
 
 module.exports = {
   addUserToDb,
