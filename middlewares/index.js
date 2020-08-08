@@ -228,6 +228,30 @@ const isSearchValid = (searchInput) => searchInput[0].length > 0 || searchInput[
 
 const prepareSearchData = (data) => data.map((elem) => `${elem}%`);
 
+const getSearchResultByQuery = async (req, res, next) => {
+  try {
+    const { name: usernameSearch, surname: surnameSearch } = req.query;
+    const data = [usernameSearch, surnameSearch];
+    if (!isSearchValid(data)) {
+      res.render('search', {
+        title: 'Search result',
+        users: [],
+        err: 'No input data',
+      });
+      return;
+    }
+    const result = await getSearchResultSql(prepareSearchData(data));
+    res.status(200);
+    res.render('search', {
+      title: 'Search result',
+      users: result,
+      err: '',
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const getSearchResult = async (req, res, next) => {
   try {
     const { usernameSearch, surnameSearch } = req.body;
@@ -241,7 +265,6 @@ const getSearchResult = async (req, res, next) => {
       return;
     }
     const result = await getSearchResultSql(prepareSearchData(data));
-    console.log(result);
     res.status(200);
     res.render('search', {
       title: 'Search result',
@@ -263,4 +286,5 @@ module.exports = {
   deleteFriends,
   addFriends,
   getSearchResult,
+  getSearchResultByQuery,
 };

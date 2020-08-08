@@ -12,6 +12,7 @@ const {
   deleteFriends,
   addFriends,
   getSearchResult,
+  getSearchResultByQuery,
 } = require('../middlewares/index');
 
 const router = Router();
@@ -44,6 +45,8 @@ router.post('/friend', deleteFriends, addFriends, (req, res) => {
   res.status = 200;
   res.redirect('/users');
 });
+
+router.get('/search', getSearchResultByQuery);
 
 router.post('/search', getSearchResult);
 

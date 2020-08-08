@@ -133,7 +133,8 @@ const addAllWhoNotAddedMeFirst = async (toInsert) => {
 const getSearchResultSql = async (data) => {
   const sql = `SELECT id, name AS username, surname, age, hobbies, gender, city
                FROM users
-               WHERE name LIKE ? AND surname LIKE ?`;
+               WHERE name LIKE ? AND surname LIKE ?
+               ORDER BY id`;
   const result = await pool.query(sql, data);
   return result[0];
 };
