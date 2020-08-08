@@ -3,7 +3,6 @@ const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
 const socialNetworkRoutes = require('./routes/index');
-// const createMysqlPool = require('./db');
 
 const app = express();
 

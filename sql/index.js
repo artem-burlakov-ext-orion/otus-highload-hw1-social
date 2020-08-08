@@ -41,7 +41,8 @@ const getNotUserFriends = async (id, userFriendsId) => {
   let sql = `SELECT DISTINCT u.id, f.userId=? AS isFriendForMe, u.name AS username, u.surname, u.age, u.hobbies, u.gender, u.city
            FROM users AS u LEFT JOIN friends AS f
            ON u.id = f.friendId
-           WHERE u.id <> ?`;
+           WHERE u.id <> ?
+           LIMIT 10`;
   const data = [id, id];
 
   if (userFriendsId.length !== 0) {
@@ -129,6 +130,15 @@ const addAllWhoNotAddedMeFirst = async (toInsert) => {
   await pool.query(sql, [toInsert]);
 };
 
+const getSearchResultSql = async (data) => {
+  const sql = `SELECT id, name AS username, surname, age, hobbies, gender, city
+               FROM users
+               WHERE name LIKE ? AND surname LIKE ?
+               LIMIT 10`;
+  const result = await pool.query(sql, data);
+  return result[0];
+}
+
 module.exports = {
   addUserToDb,
   getFriendsUserAdded,
@@ -143,4 +153,5 @@ module.exports = {
   updateNotMutualWhoAddedMeFirstToMutual,
   getWhoInNewFriendListAndAddMeFirst,
   addAllWhoNotAddedMeFirst,
+  getSearchResultSql,
 };

@@ -14,6 +14,7 @@ const {
   getWhoInNewFriendListAndAddMeFirst,
   updateNotMutualWhoAddedMeFirstToMutual,
   addAllWhoNotAddedMeFirst,
+  getSearchResultSql
 } = require('../sql/index');
 
 const isAuth = (req, res, next) => {
@@ -223,6 +224,22 @@ const addFriends = async (req, res, next) => {
   }
 };
 
+const getSearchResult = async (req, res, next) => {
+  try {
+    const { usernameSearch , surnameSearch } = req.body;
+    const data = [`${usernameSearch}%`, `${surnameSearch}%`];
+    const result = await getSearchResultSql(data);
+    console.log(result);
+    res.status(200);
+    res.render('search', {
+          title: 'Search result',
+          users: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   isAuth,
   registerUser,
@@ -232,4 +249,5 @@ module.exports = {
   loginUser,
   deleteFriends,
   addFriends,
+  getSearchResult
 };

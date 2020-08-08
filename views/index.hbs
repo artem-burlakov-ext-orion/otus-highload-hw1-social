@@ -1,4 +1,21 @@
 
+<form action='/search' method='post'>
+          <div class='row'>
+              <div class='input-field col s12'>
+                <input class='active' type='search' name='usernameSearch' id='usernameSearch'/>
+                <label class='active' for='usernameSearch'>Username</label>
+              </div>
+            </div>
+            <div class='row'>
+              <div class='input-field col m12'>
+                <input class='active' type='search' name='surnameSearch' id='surnameSearch'/>
+                <label class='active' for='surnameSearch'>Surname</label>
+              </div>
+            </div>
+            <div class='row'>
+                <button type='submit' class='btn-small'>Search</button>
+            </div>
+</form>
 <h2>Nice to see you, {{login}}</h2>
 
 {{#if users.length}}

@@ -1,0 +1,19 @@
+{{#if users.length}}
+<h2>{{users.length}} users found!</h2>
+<ul>
+    {{#each users}}
+      <li class='profile'> 
+        <label>
+          <span>{{username}}</span>
+          <span>{{surname}}</span>
+          <span>{{age}}</span>
+          <span>{{gender}}</span>
+          <span>{{city}}</span>
+        </label>
+      </li>
+    {{/each}}
+</ul>
+
+{{else}}
+<p>No users found!</p>
+{{/if}}

@@ -11,6 +11,7 @@ const {
   loginUser,
   deleteFriends,
   addFriends,
+  getSearchResult,
 } = require('../middlewares/index');
 
 const router = Router();
@@ -43,6 +44,8 @@ router.post('/friend', deleteFriends, addFriends, (req, res) => {
   res.status = 200;
   res.redirect('/users');
 });
+
+router.post('/search', getSearchResult);
 
 router.use((req, res, next) => {
   const error = new Error('Not found');
