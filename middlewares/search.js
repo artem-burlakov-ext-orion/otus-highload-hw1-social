@@ -9,8 +9,6 @@ const getSearchResult = async (req, res, next) => {
     const data = {};
     data.userName = req.query.name || req.body.usernameSearch;
     data.surName = req.query.surname || req.body.surnameSearch;
-    console.log("DATA", data);
-
     if (!isSearchDataValid(data)) {
       res.render('search', {
         title: 'Search result',
