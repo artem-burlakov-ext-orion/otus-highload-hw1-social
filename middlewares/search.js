@@ -17,7 +17,7 @@ const getSearchResult = async (req, res, next) => {
       });
       return;
     }
-    const result = await getSearchResultSql(prepareSearchData(Object.values(data)));
+    const result = await getSearchResultSql(prepareSearchData(data));
     res.status(200);
     res.render('search', {
       title: 'Search result',
