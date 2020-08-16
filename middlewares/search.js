@@ -6,24 +6,22 @@ const prepareSearchData = (data) => Object.values(data).map((elem) => `${elem}%`
 
 const getSearchResult = async (req, res, next) => {
   try {
-    const data = {};
-    data.userName = req.query.name || req.body.usernameSearch;
-    data.surName = req.query.surname || req.body.surnameSearch;
-    if (!isSearchDataValid(data)) {
-      res.render('search', {
-        title: 'Search result',
-        users: [],
-        err: 'No input data',
-      });
+    const searchData = {};
+    searchData.userName = req.query.name || req.body.usernameSearch;
+    searchData.surName = req.query.surname || req.body.surnameSearch;
+    const data = {
+      title: 'Search result',
+    };
+    if (!isSearchDataValid(searchData)) {
+      data.users = [];
+      data.err = 'No input data';
+      res.render('search', data);
       return;
     }
-    const result = await getSearchResultSql(prepareSearchData(data));
+    data.users = await getSearchResultSql(prepareSearchData(searchData));
+    data.err = '';
     res.status(200);
-    res.render('search', {
-      title: 'Search result',
-      users: result,
-      err: '',
-    });
+    res.render('search', data);
   } catch (e) {
     next(e);
   }
