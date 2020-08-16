@@ -30,20 +30,20 @@ const setHashedPassword = async (user, password) => {
 };
 
 const registerUser = async (req, res, next) => {
-  const user = {
-    name: req.body.name,
-    surname: req.body.surname,
-    age: req.body.age,
-    hobbies: req.body.hobbies,
-    gender: req.body.gender,
-    city: req.body.city,
-    login: req.body.login,
-  };
-
-  const { password } = req.body;
-
   try {
+    const user = {
+      name: req.body.name,
+      surname: req.body.surname,
+      age: req.body.age,
+      hobbies: req.body.hobbies,
+      gender: req.body.gender,
+      city: req.body.city,
+      login: req.body.login,
+    };
+    const { password } = req.body;
+
     await addUserToDb(await setHashedPassword(user, password));
+
     res.status = 201;
     res.redirect('/');
   } catch (e) {
@@ -54,22 +54,17 @@ const registerUser = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
   try {
     const { userId, login } = req.session;
+    const data = {};
+    data.title = 'Social network';
+    data.login = login;
     const friendsUserAdded = await getFriendsUserAdded(userId);
     const mutualFriends = await getUserMutualFriends(userId);
     const userFriends = friendsUserAdded.concat(mutualFriends);
     const userFriendsId = userFriends.map((friends) => friends.id);
     const notUserFriends = await getNotUserFriends(userId, userFriendsId);
-    console.log('IADD', friendsUserAdded);
-    console.log('MUTUAL', mutualFriends);
-    console.log('NOT', notUserFriends);
-    const users = userFriends.concat(notUserFriends);
-
+    data.users = userFriends.concat(notUserFriends);
     res.status(200);
-    res.render('index', {
-      title: 'Social network',
-      users,
-      login,
-    });
+    res.render('index', data);
   } catch (e) {
     next(e);
   }
@@ -168,7 +163,6 @@ const deleteFriends = async (req, res, next) => {
     return;
   }
   const unFriendList = getUnfriendList(unFriendData);
-  console.log('UNFRIEND_LIST', unFriendList);
   try {
     await allDeleteFriendsOps(req.session.userId, unFriendList);
     next();
@@ -207,10 +201,8 @@ const addFriends = async (req, res, next) => {
     next();
     return;
   }
-  console.log('NEWF', newFriends);
   const newFriendArr = Array.isArray(newFriends) ? newFriends : [newFriends];
   const newFriendList = newFriendArr.map((newFriend) => Number(newFriend));
-  console.log('TOADD', newFriendList);
   if (newFriendList.length === 0) {
     next();
     return;
